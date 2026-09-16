@@ -33,3 +33,16 @@ docker run --rm -p 8080:8080 \
   -e BABY_BONUS_CALLER_ID=local-dev-client \
   baby-bonus-enrollment-service
 ```
+
+## CI/CD
+
+GitHub Actions runs tests and Docker image build on pushes and pull requests.
+
+Kotlin static analysis is intentionally deferred while Detekt and ktlint support catches up with Kotlin `2.4.20`. The assessment keeps the latest stable Kotlin patch version instead of downgrading the language toolchain only to satisfy a lint plugin.
+
+For ECR publishing from `main`, configure:
+
+- repository variable `AWS_ACCOUNT_ID`
+- repository secret `AWS_ROLE_TO_ASSUME`
+
+The ECR repository is expected to exist as `baby-bonus-enrollment-service` in `ap-southeast-1`; creating it is handled by infrastructure rather than the CI workflow.
