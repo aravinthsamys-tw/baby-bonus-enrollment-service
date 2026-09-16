@@ -1,0 +1,13 @@
+.git/
+.gradle/
+.idea/
+.kotlin/
+build/
+out/
+
+.env
+.env.*
+
+*.iml
+*.log
+.DS_Store
