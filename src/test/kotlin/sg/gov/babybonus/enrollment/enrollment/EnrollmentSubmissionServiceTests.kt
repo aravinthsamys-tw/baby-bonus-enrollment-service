@@ -7,6 +7,10 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.transaction.annotation.Transactional
+import sg.gov.babybonus.enrollment.disbursement.CashGiftDisbursementService
+import sg.gov.babybonus.enrollment.disbursement.DisbursementRepository
+import sg.gov.babybonus.enrollment.disbursement.DisbursementStatus
+import sg.gov.babybonus.enrollment.disbursement.DisbursementType
 import sg.gov.babybonus.enrollment.eligibility.IneligibilityReason
 
 @SpringBootTest
@@ -14,6 +18,7 @@ import sg.gov.babybonus.enrollment.eligibility.IneligibilityReason
 class EnrollmentSubmissionServiceTests(
     @Autowired private val service: EnrollmentSubmissionService,
     @Autowired private val enrollmentRepository: EnrollmentRepository,
+    @Autowired private val disbursementRepository: DisbursementRepository,
 ) {
 
     @Test
@@ -35,6 +40,15 @@ class EnrollmentSubmissionServiceTests(
         assertEquals("S8001234A", enrollment.parentNric)
         assertEquals(EnrollmentStatus.ENROLLED, enrollment.status)
         assertNotNull(enrollment.enrolledAt)
+
+        val disbursements = disbursementRepository.findAll()
+        assertEquals(1, disbursements.size)
+        val disbursement = disbursements.single()
+        assertEquals(enrollment.id, disbursement.enrollment.id)
+        assertEquals(DisbursementType.CASH_GIFT, disbursement.type)
+        assertEquals(CashGiftDisbursementService.CASH_GIFT_AMOUNT, disbursement.amount)
+        assertEquals(DisbursementStatus.PENDING, disbursement.status)
+        assertNull(disbursement.processedAt)
     }
 
     @Test
@@ -51,5 +65,6 @@ class EnrollmentSubmissionServiceTests(
         assertNull(result.enrollmentId)
         assertNull(result.enrolledAt)
         assertEquals(0, enrollmentRepository.count())
+        assertEquals(0, disbursementRepository.count())
     }
 }

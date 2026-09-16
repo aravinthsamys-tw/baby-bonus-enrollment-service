@@ -2,6 +2,7 @@ package sg.gov.babybonus.enrollment.enrollment
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import sg.gov.babybonus.enrollment.disbursement.CashGiftDisbursementService
 import sg.gov.babybonus.enrollment.eligibility.EligibilityRequest
 import sg.gov.babybonus.enrollment.eligibility.EnrollmentEligibilityService
 import java.time.Instant
@@ -10,6 +11,7 @@ import java.time.Instant
 class EnrollmentSubmissionService(
     private val eligibilityService: EnrollmentEligibilityService,
     private val enrollmentRepository: EnrollmentRepository,
+    private val cashGiftDisbursementService: CashGiftDisbursementService,
 ) {
 
     @Transactional
@@ -36,6 +38,8 @@ class EnrollmentSubmissionService(
                 enrolledAt = Instant.now(),
             ),
         )
+
+        cashGiftDisbursementService.initiateCashGift(enrollment)
 
         return EnrollmentSubmissionResult.enrolled(enrollment)
     }
