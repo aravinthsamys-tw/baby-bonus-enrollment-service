@@ -1,9 +1,14 @@
 package sg.gov.babybonus.enrollment.api
 
 import org.hamcrest.Matchers.notNullValue
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.system.CapturedOutput
+import org.springframework.boot.test.system.OutputCaptureExtension
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
@@ -13,9 +18,15 @@ import org.springframework.transaction.annotation.Transactional
 import tools.jackson.databind.ObjectMapper
 import java.util.UUID
 
-@SpringBootTest(properties = ["baby-bonus.auth.api-key=test-api-key"])
+@SpringBootTest(
+    properties = [
+        "baby-bonus.auth.api-key=test-api-key",
+        "baby-bonus.auth.caller-identity=test-client",
+    ],
+)
 @AutoConfigureMockMvc
 @Transactional
+@ExtendWith(OutputCaptureExtension::class)
 class EnrollmentControllerTests(
     @Autowired private val mockMvc: MockMvc,
     @Autowired private val objectMapper: ObjectMapper,
@@ -69,7 +80,7 @@ class EnrollmentControllerTests(
     }
 
     @Test
-    fun submitEnrollmentReturnsCreatedForEligibleChild() {
+    fun submitEnrollmentReturnsCreatedForEligibleChild(output: CapturedOutput) {
         mockMvc.post("/api/v1/enrollments") {
             header(API_KEY_HEADER, API_KEY)
             contentType = MediaType.APPLICATION_JSON
@@ -87,6 +98,14 @@ class EnrollmentControllerTests(
                 jsonPath("$.status") { value("ENROLLED") }
                 jsonPath("$.enrolledAt", notNullValue())
             }
+
+        assertTrue(output.out.contains(""""operation":"ELIGIBILITY_CHECK_RESULT""""))
+        assertTrue(output.out.contains(""""operation":"DISBURSEMENT_INITIATED""""))
+        assertTrue(output.out.contains(""""operation":"ENROLLMENT_SUBMITTED""""))
+        assertTrue(output.out.contains(""""callerIdentity":"test-client""""))
+        assertTrue(output.out.contains(""""subject":"T240****A""""))
+        assertTrue(output.out.contains(""""outcome":"ENROLLED""""))
+        assertFalse(output.out.contains("T2400001A"))
     }
 
     @Test

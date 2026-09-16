@@ -17,3 +17,4 @@ server:
 baby-bonus:
   auth:
     api-key: ${BABY_BONUS_API_KEY:}
+    caller-identity: ${BABY_BONUS_CALLER_ID:baby-bonus-api-client}

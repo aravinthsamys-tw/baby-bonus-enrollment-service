@@ -8,6 +8,7 @@ Configure an API key before starting the service:
 
 ```bash
 export BABY_BONUS_API_KEY=local-dev-api-key
+export BABY_BONUS_CALLER_ID=local-dev-client
 ./gradlew bootRun
 ```
 
@@ -18,3 +19,5 @@ X-API-Key: local-dev-api-key
 ```
 
 For this assessment, the caller receives the API key through environment-specific configuration. In production, credential issuance, rotation, and revocation would be handled by the platform or an identity provider rather than committed to source control.
+
+Successful API authentication also associates the request with the configured caller identity for audit logging.

@@ -2,6 +2,8 @@ package sg.gov.babybonus.enrollment.enrollment
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import sg.gov.babybonus.enrollment.audit.AuditLogger
+import sg.gov.babybonus.enrollment.audit.AuditOperation
 import sg.gov.babybonus.enrollment.disbursement.CashGiftDisbursementService
 import sg.gov.babybonus.enrollment.eligibility.EligibilityRequest
 import sg.gov.babybonus.enrollment.eligibility.EnrollmentEligibilityService
@@ -12,6 +14,7 @@ class EnrollmentSubmissionService(
     private val eligibilityService: EnrollmentEligibilityService,
     private val enrollmentRepository: EnrollmentRepository,
     private val cashGiftDisbursementService: CashGiftDisbursementService,
+    private val auditLogger: AuditLogger,
 ) {
 
     @Transactional
@@ -27,6 +30,7 @@ class EnrollmentSubmissionService(
             val reason = checkNotNull(eligibility.reason) {
                 "Ineligible eligibility result must include a reason"
             }
+            auditLogger.log(AuditOperation.ENROLLMENT_SUBMITTED, request.childNric, reason.name)
             return EnrollmentSubmissionResult.ineligible(reason)
         }
 
@@ -40,6 +44,7 @@ class EnrollmentSubmissionService(
         )
 
         cashGiftDisbursementService.initiateCashGift(enrollment)
+        auditLogger.log(AuditOperation.ENROLLMENT_SUBMITTED, request.childNric, enrollment.status.name)
 
         return EnrollmentSubmissionResult.enrolled(enrollment)
     }

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
+import sg.gov.babybonus.enrollment.audit.AuditLogger
 import sg.gov.babybonus.enrollment.enrollment.EnrollmentRepository
 import sg.gov.babybonus.enrollment.ica.Citizenship
 import sg.gov.babybonus.enrollment.ica.IcaChild
@@ -13,6 +14,7 @@ import sg.gov.babybonus.enrollment.ica.IcaChildLookup
 import sg.gov.babybonus.enrollment.iroas.IroasParent
 import sg.gov.babybonus.enrollment.iroas.IroasParentLookup
 import sg.gov.babybonus.enrollment.iroas.Relationship
+import tools.jackson.databind.ObjectMapper
 import java.time.LocalDate
 
 class EnrollmentEligibilityServiceTests {
@@ -84,6 +86,7 @@ class EnrollmentEligibilityServiceTests {
             icaChildLookup = MapIcaChildLookup(children),
             iroasParentLookup = MapIroasParentLookup(parents),
             enrollmentRepository = enrollmentRepository,
+            auditLogger = AuditLogger(ObjectMapper()),
         )
     }
 

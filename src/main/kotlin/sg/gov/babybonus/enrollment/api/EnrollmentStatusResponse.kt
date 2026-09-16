@@ -4,6 +4,7 @@ import sg.gov.babybonus.enrollment.disbursement.DisbursementStatus
 import sg.gov.babybonus.enrollment.disbursement.DisbursementType
 import sg.gov.babybonus.enrollment.enrollment.EnrollmentDetails
 import sg.gov.babybonus.enrollment.enrollment.EnrollmentStatus
+import sg.gov.babybonus.enrollment.sensitive.NricMasker
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.UUID
@@ -19,18 +20,11 @@ data class EnrollmentStatusResponse(
         fun from(details: EnrollmentDetails): EnrollmentStatusResponse =
             EnrollmentStatusResponse(
                 id = details.id,
-                childNric = maskNric(details.childNric),
+                childNric = NricMasker.mask(details.childNric),
                 status = details.status,
                 enrolledAt = details.enrolledAt,
                 disbursement = details.disbursement?.let(DisbursementResponse::from),
             )
-
-        private fun maskNric(nric: String): String =
-            if (nric.length <= 5) {
-                "*".repeat(nric.length)
-            } else {
-                "${nric.take(4)}${"*".repeat(nric.length - 5)}${nric.last()}"
-            }
     }
 }
 
