@@ -7,15 +7,61 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.transaction.annotation.Transactional
+import tools.jackson.databind.ObjectMapper
+import java.util.UUID
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
 class EnrollmentControllerTests(
     @Autowired private val mockMvc: MockMvc,
+    @Autowired private val objectMapper: ObjectMapper,
 ) {
+
+    @Test
+    fun getEnrollmentReturnsEnrollmentStatus() {
+        val postResponse = mockMvc.post("/api/v1/enrollments") {
+            contentType = MediaType.APPLICATION_JSON
+            content = """
+                {
+                  "childNric": "T2400001A",
+                  "parentNric": "S8001234A"
+                }
+            """.trimIndent()
+        }
+            .andReturn()
+            .response
+            .contentAsString
+        val enrollmentId = objectMapper.readTree(postResponse).get("id").stringValue()
+
+        mockMvc.get("/api/v1/enrollments/$enrollmentId")
+            .andExpect {
+                status { isOk() }
+                content { contentTypeCompatibleWith(MediaType.APPLICATION_JSON) }
+                jsonPath("$.id") { value(enrollmentId) }
+                jsonPath("$.childNric") { value("T240****A") }
+                jsonPath("$.status") { value("ENROLLED") }
+                jsonPath("$.enrolledAt", notNullValue())
+                jsonPath("$.disbursement.type") { value("CASH_GIFT") }
+                jsonPath("$.disbursement.amount") { value(3000.00) }
+                jsonPath("$.disbursement.status") { value("PENDING") }
+                jsonPath("$.parentNric") { doesNotExist() }
+            }
+    }
+
+    @Test
+    fun getEnrollmentReturnsNotFoundForUnknownId() {
+        mockMvc.get("/api/v1/enrollments/${UUID.randomUUID()}")
+            .andExpect {
+                status { isNotFound() }
+                content { contentTypeCompatibleWith(MediaType.APPLICATION_JSON) }
+                jsonPath("$.code") { value("ENROLLMENT_NOT_FOUND") }
+                jsonPath("$.message") { value("Enrollment not found.") }
+            }
+    }
 
     @Test
     fun submitEnrollmentReturnsCreatedForEligibleChild() {

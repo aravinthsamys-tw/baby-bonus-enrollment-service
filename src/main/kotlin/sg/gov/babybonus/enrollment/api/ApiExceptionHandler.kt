@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import sg.gov.babybonus.enrollment.eligibility.IneligibilityReason
 import sg.gov.babybonus.enrollment.enrollment.EnrollmentIneligibleException
+import sg.gov.babybonus.enrollment.enrollment.EnrollmentNotFoundException
 
 @RestControllerAdvice
 class ApiExceptionHandler {
@@ -39,6 +40,17 @@ class ApiExceptionHandler {
         ResponseEntity
             .status(httpStatusFor(error.reason))
             .body(apiErrorFor(error.reason))
+
+    @ExceptionHandler(EnrollmentNotFoundException::class)
+    fun handleEnrollmentNotFound(): ResponseEntity<ApiErrorResponse> =
+        ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(
+                ApiErrorResponse(
+                    code = ApiErrorCode.ENROLLMENT_NOT_FOUND,
+                    message = "Enrollment not found.",
+                ),
+            )
 
     private fun httpStatusFor(reason: IneligibilityReason): HttpStatus =
         when (reason) {
