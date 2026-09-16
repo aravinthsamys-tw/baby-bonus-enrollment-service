@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional
 import tools.jackson.databind.ObjectMapper
 import java.util.UUID
 
-@SpringBootTest
+@SpringBootTest(properties = ["baby-bonus.auth.api-key=test-api-key"])
 @AutoConfigureMockMvc
 @Transactional
 class EnrollmentControllerTests(
@@ -24,6 +24,7 @@ class EnrollmentControllerTests(
     @Test
     fun getEnrollmentReturnsEnrollmentStatus() {
         val postResponse = mockMvc.post("/api/v1/enrollments") {
+            header(API_KEY_HEADER, API_KEY)
             contentType = MediaType.APPLICATION_JSON
             content = """
                 {
@@ -37,7 +38,9 @@ class EnrollmentControllerTests(
             .contentAsString
         val enrollmentId = objectMapper.readTree(postResponse).get("id").stringValue()
 
-        mockMvc.get("/api/v1/enrollments/$enrollmentId")
+        mockMvc.get("/api/v1/enrollments/$enrollmentId") {
+            header(API_KEY_HEADER, API_KEY)
+        }
             .andExpect {
                 status { isOk() }
                 content { contentTypeCompatibleWith(MediaType.APPLICATION_JSON) }
@@ -54,7 +57,9 @@ class EnrollmentControllerTests(
 
     @Test
     fun getEnrollmentReturnsNotFoundForUnknownId() {
-        mockMvc.get("/api/v1/enrollments/${UUID.randomUUID()}")
+        mockMvc.get("/api/v1/enrollments/${UUID.randomUUID()}") {
+            header(API_KEY_HEADER, API_KEY)
+        }
             .andExpect {
                 status { isNotFound() }
                 content { contentTypeCompatibleWith(MediaType.APPLICATION_JSON) }
@@ -66,6 +71,7 @@ class EnrollmentControllerTests(
     @Test
     fun submitEnrollmentReturnsCreatedForEligibleChild() {
         mockMvc.post("/api/v1/enrollments") {
+            header(API_KEY_HEADER, API_KEY)
             contentType = MediaType.APPLICATION_JSON
             content = """
                 {
@@ -86,6 +92,7 @@ class EnrollmentControllerTests(
     @Test
     fun submitEnrollmentReturnsUnprocessableEntityForIneligibleChild() {
         mockMvc.post("/api/v1/enrollments") {
+            header(API_KEY_HEADER, API_KEY)
             contentType = MediaType.APPLICATION_JSON
             content = """
                 {
@@ -112,6 +119,7 @@ class EnrollmentControllerTests(
         """.trimIndent()
 
         mockMvc.post("/api/v1/enrollments") {
+            header(API_KEY_HEADER, API_KEY)
             contentType = MediaType.APPLICATION_JSON
             content = requestBody
         }
@@ -120,6 +128,7 @@ class EnrollmentControllerTests(
             }
 
         mockMvc.post("/api/v1/enrollments") {
+            header(API_KEY_HEADER, API_KEY)
             contentType = MediaType.APPLICATION_JSON
             content = requestBody
         }
@@ -134,6 +143,7 @@ class EnrollmentControllerTests(
     @Test
     fun submitEnrollmentReturnsBadRequestForBlankNric() {
         mockMvc.post("/api/v1/enrollments") {
+            header(API_KEY_HEADER, API_KEY)
             contentType = MediaType.APPLICATION_JSON
             content = """
                 {
@@ -153,6 +163,7 @@ class EnrollmentControllerTests(
     @Test
     fun submitEnrollmentReturnsBadRequestForInvalidJson() {
         mockMvc.post("/api/v1/enrollments") {
+            header(API_KEY_HEADER, API_KEY)
             contentType = MediaType.APPLICATION_JSON
             content = """
                 {
@@ -167,5 +178,42 @@ class EnrollmentControllerTests(
                 jsonPath("$.code") { value("INVALID_REQUEST") }
                 jsonPath("$.message") { value("Request body is invalid.") }
             }
+    }
+
+    @Test
+    fun submitEnrollmentReturnsUnauthorizedWhenApiKeyIsMissing() {
+        mockMvc.post("/api/v1/enrollments") {
+            contentType = MediaType.APPLICATION_JSON
+            content = """
+                {
+                  "childNric": "T2400001A",
+                  "parentNric": "S8001234A"
+                }
+            """.trimIndent()
+        }
+            .andExpect {
+                status { isUnauthorized() }
+                content { contentTypeCompatibleWith(MediaType.APPLICATION_JSON) }
+                jsonPath("$.code") { value("UNAUTHORIZED") }
+                jsonPath("$.message") { value("Authentication is required.") }
+            }
+    }
+
+    @Test
+    fun getEnrollmentReturnsUnauthorizedWhenApiKeyIsInvalid() {
+        mockMvc.get("/api/v1/enrollments/${UUID.randomUUID()}") {
+            header(API_KEY_HEADER, "wrong-api-key")
+        }
+            .andExpect {
+                status { isUnauthorized() }
+                content { contentTypeCompatibleWith(MediaType.APPLICATION_JSON) }
+                jsonPath("$.code") { value("UNAUTHORIZED") }
+                jsonPath("$.message") { value("Authentication is required.") }
+            }
+    }
+
+    private companion object {
+        const val API_KEY_HEADER = "X-API-Key"
+        const val API_KEY = "test-api-key"
     }
 }

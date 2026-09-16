@@ -13,7 +13,7 @@ import sg.gov.babybonus.enrollment.disbursement.DisbursementStatus
 import sg.gov.babybonus.enrollment.disbursement.DisbursementType
 import sg.gov.babybonus.enrollment.eligibility.IneligibilityReason
 
-@SpringBootTest
+@SpringBootTest(properties = ["baby-bonus.auth.api-key=test-api-key"])
 @Transactional
 class EnrollmentSubmissionServiceTests(
     @Autowired private val service: EnrollmentSubmissionService,

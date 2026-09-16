@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional
 import sg.gov.babybonus.enrollment.disbursement.DisbursementType
 import java.util.UUID
 
-@SpringBootTest
+@SpringBootTest(properties = ["baby-bonus.auth.api-key=test-api-key"])
 @Transactional
 class EnrollmentQueryServiceTests(
     @Autowired private val enrollmentSubmissionService: EnrollmentSubmissionService,
