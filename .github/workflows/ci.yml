@@ -34,7 +34,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Run tests
-        run: ./gradlew --no-daemon test
+        run: ./gradlew --no-daemon clean test
 
       - name: Build Docker image
         run: docker build -t "$IMAGE_NAME:$GITHUB_SHA" .
