@@ -30,7 +30,7 @@ class MockIroasParentLookupTests {
     fun returnsNullWhenParentIsUnknown(@TempDir tempDir: Path) {
         val lookup = createLookup(tempDir)
 
-        assertNull(lookup.findParentByNric("S9999999Z"))
+        assertNull(lookup.findParentByNric("UNKNOWN_PARENT_NRIC"))
     }
 
     private fun createLookup(tempDir: Path): MockIroasParentLookup {

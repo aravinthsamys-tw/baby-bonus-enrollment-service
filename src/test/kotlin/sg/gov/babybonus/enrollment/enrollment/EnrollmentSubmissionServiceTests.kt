@@ -56,7 +56,7 @@ class EnrollmentSubmissionServiceTests(
     fun returnsIneligibleResultWithoutCreatingEnrollment() {
         val result = service.submit(
             EnrollmentSubmissionRequest(
-                childNric = "T2499999Z",
+                childNric = "UNKNOWN_CHILD_NRIC",
                 parentNric = "S8001234A",
             ),
         )

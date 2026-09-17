@@ -117,7 +117,7 @@ class EnrollmentControllerTests(
             contentType = MediaType.APPLICATION_JSON
             content = """
                 {
-                  "childNric": "T2499999Z",
+                  "childNric": "UNKNOWN_CHILD_NRIC",
                   "parentNric": "S8001234A"
                 }
             """.trimIndent()

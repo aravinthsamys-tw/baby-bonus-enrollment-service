@@ -32,7 +32,7 @@ class MockIcaChildLookupTests {
     fun returnsNullWhenChildIsUnknown(@TempDir tempDir: Path) {
         val lookup = createLookup(tempDir)
 
-        assertNull(lookup.findChildByNric("T2499999Z"))
+        assertNull(lookup.findChildByNric("UNKNOWN_CHILD_NRIC"))
     }
 
     private fun createLookup(tempDir: Path): MockIcaChildLookup {
