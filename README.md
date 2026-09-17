@@ -34,11 +34,19 @@ docker run --rm -p 8080:8080 \
   baby-bonus-enrollment-service
 ```
 
+## Testing
+
+Run the test suite from a clean build:
+
+```bash
+./gradlew --no-daemon clean test
+```
+
 ## CI/CD
 
 GitHub Actions runs tests and Docker image build on pushes and pull requests.
 
-Kotlin static analysis is intentionally deferred while Detekt and ktlint support catches up with Kotlin `2.4.20`. The assessment keeps the latest stable Kotlin patch version instead of downgrading the language toolchain only to satisfy a lint plugin.
+Kotlin static analysis is not currently part of CI because the available Detekt and ktlint versions did not cleanly support Kotlin `2.4.20` during implementation.
 
 For ECR publishing from `main`, configure:
 
@@ -56,3 +64,21 @@ cd infra
 terraform init
 terraform validate
 ```
+
+## Assumptions
+
+- A child may have at most one enrollment.
+- A successful enrollment creates a pending `CASH_GIFT` disbursement for SGD 3000.
+- ICA and IROAS are represented by local mock data files for this assessment.
+- H2 is used for local and test persistence; production would use a managed database such as RDS PostgreSQL.
+- API key authentication is used for this assessment; production should use managed identity, OAuth2/JWT, mTLS, or an equivalent centrally governed mechanism.
+- Raw NRIC values may be stored for lookup and uniqueness, but are not returned unmasked or written to application logs.
+
+## What I Would Do Next
+
+- Replace mock ICA and IROAS lookups with real adapters, including timeouts, retries, authentication, and contract tests.
+- Map concurrent duplicate-enrollment database races to the same duplicate-enrollment response.
+- Move disbursement processing to an asynchronous, reconcilable payment workflow with idempotency and reversal support.
+- Add CDA account lifecycle, refunds, and manual correction workflows after authorization and audit rules are defined.
+- Add production-grade identity, field-level NRIC protection, durable audit retention, monitoring, and alerting.
+- Revisit Kotlin static analysis once ktlint or Detekt support cleanly matches the selected Kotlin version.

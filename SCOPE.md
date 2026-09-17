@@ -1,6 +1,10 @@
 # Scope
 
-This submission prioritises a small, defensible Baby Bonus enrollment service. The goal is to implement the core path well, keep sensitive data handling explicit, and document production trade-offs instead of partially building every optional use case.
+This submission prioritises a small Baby Bonus enrollment service focused on the core enrollment path. The goal is to keep sensitive data handling explicit and document production trade-offs instead of partially building every optional use case.
+
+## Development Approach
+
+This repository uses a lightweight spec-driven approach. `SCOPE.md` defines what is in and out, and `docs/specs/0001-core-enrollment-flow.md` captures the core behaviour and invariants before implementation. This is intentionally small for the assessment instead of adding separate requirement, design, and task documents.
 
 ## Build
 
@@ -17,11 +21,11 @@ This submission prioritises a small, defensible Baby Bonus enrollment service. T
 - Creation of a `CASH_GIFT` disbursement for SGD 3000 after successful enrollment.
 - H2 persistence for local and test execution.
 - Centralized API error handling with meaningful messages that do not leak implementation details.
-- API authentication using an assessment-appropriate mechanism documented in the README.
+- API key authentication documented in the README.
 - Structured audit logging for enrollment submission, eligibility decisions, and disbursement initiation, with masked child NRIC values.
 - Service-layer tests for the happy path and key error cases.
 - At least one HTTP integration test exercising the full enrollment flow.
-- Dockerfile and GitHub Actions CI covering lint, test, Docker image build, and ECR push steps.
+- Dockerfile and GitHub Actions CI covering tests, Docker image build, and conditional ECR push steps.
 - Terraform under `infra/` for the components requested in the brief.
 - Concise documentation for architecture, data sensitivity, AI usage, and known production gaps.
 
@@ -39,7 +43,7 @@ These use cases introduce additional authorization, audit, financial reversal, a
 - ICA and IROAS are mocked with provided JSON files.
 - Disbursement is represented as an internal record rather than an integration with a payment or government finance system.
 - H2 is used for assessment persistence; production would use a durable managed database such as RDS PostgreSQL.
-- Authentication will be implemented locally for the assessment rather than integrating with a real identity provider.
+- Authentication is implemented locally for the assessment rather than integrating with a real identity provider.
 
 ## Assumptions
 
@@ -63,3 +67,4 @@ The assessment implementation intentionally simplifies:
 - Full audit retention, tamper evidence, alerting, and compliance reporting.
 - High availability, autoscaling, backup, disaster recovery, and blue/green deployment.
 - Legacy migration, coexistence, and phased cutover.
+- Kotlin static analysis in CI is deferred because the available ktlint and Detekt versions did not cleanly support Kotlin 2.4.20 during implementation.
