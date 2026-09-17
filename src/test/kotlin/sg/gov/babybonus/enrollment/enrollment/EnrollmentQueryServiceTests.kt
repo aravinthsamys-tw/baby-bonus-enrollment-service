@@ -7,10 +7,11 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.transaction.annotation.Transactional
+import sg.gov.babybonus.enrollment.TestProperties
 import sg.gov.babybonus.enrollment.disbursement.DisbursementType
 import java.util.UUID
 
-@SpringBootTest(properties = ["baby-bonus.auth.api-key=test-api-key"])
+@SpringBootTest(properties = [TestProperties.API_KEY, TestProperties.UNIQUE_H2_DATABASE])
 @Transactional
 class EnrollmentQueryServiceTests(
     @Autowired private val enrollmentSubmissionService: EnrollmentSubmissionService,

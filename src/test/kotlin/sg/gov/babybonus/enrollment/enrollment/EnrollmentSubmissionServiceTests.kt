@@ -11,9 +11,10 @@ import sg.gov.babybonus.enrollment.disbursement.CashGiftDisbursementService
 import sg.gov.babybonus.enrollment.disbursement.DisbursementRepository
 import sg.gov.babybonus.enrollment.disbursement.DisbursementStatus
 import sg.gov.babybonus.enrollment.disbursement.DisbursementType
+import sg.gov.babybonus.enrollment.TestProperties
 import sg.gov.babybonus.enrollment.eligibility.IneligibilityReason
 
-@SpringBootTest(properties = ["baby-bonus.auth.api-key=test-api-key"])
+@SpringBootTest(properties = [TestProperties.API_KEY, TestProperties.UNIQUE_H2_DATABASE])
 @Transactional
 class EnrollmentSubmissionServiceTests(
     @Autowired private val service: EnrollmentSubmissionService,

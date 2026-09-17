@@ -5,22 +5,22 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.test.annotation.DirtiesContext
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.web.client.RestTemplate
+import sg.gov.babybonus.enrollment.TestProperties
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = [
-        "baby-bonus.auth.api-key=test-api-key",
-        "baby-bonus.auth.caller-identity=test-client",
+        TestProperties.API_KEY,
+        TestProperties.CALLER_IDENTITY,
+        TestProperties.UNIQUE_H2_DATABASE,
     ],
 )
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class EnrollmentHttpIntegrationTests(
     @LocalServerPort private val port: Int,
 ) {

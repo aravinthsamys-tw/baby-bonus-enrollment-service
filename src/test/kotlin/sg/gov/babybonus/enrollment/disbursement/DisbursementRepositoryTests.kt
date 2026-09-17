@@ -6,12 +6,13 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
+import sg.gov.babybonus.enrollment.TestProperties
 import sg.gov.babybonus.enrollment.enrollment.Enrollment
 import sg.gov.babybonus.enrollment.enrollment.EnrollmentRepository
 import sg.gov.babybonus.enrollment.enrollment.EnrollmentStatus
 import java.math.BigDecimal
 
-@DataJpaTest
+@DataJpaTest(properties = [TestProperties.UNIQUE_H2_DATABASE])
 class DisbursementRepositoryTests(
     @Autowired private val disbursementRepository: DisbursementRepository,
     @Autowired private val enrollmentRepository: EnrollmentRepository,

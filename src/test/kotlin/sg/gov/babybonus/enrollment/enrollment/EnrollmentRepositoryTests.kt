@@ -7,8 +7,9 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.dao.DataIntegrityViolationException
+import sg.gov.babybonus.enrollment.TestProperties
 
-@DataJpaTest
+@DataJpaTest(properties = [TestProperties.UNIQUE_H2_DATABASE])
 class EnrollmentRepositoryTests(
     @Autowired private val repository: EnrollmentRepository,
 ) {

@@ -15,13 +15,15 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.transaction.annotation.Transactional
+import sg.gov.babybonus.enrollment.TestProperties
 import tools.jackson.databind.ObjectMapper
 import java.util.UUID
 
 @SpringBootTest(
     properties = [
-        "baby-bonus.auth.api-key=test-api-key",
-        "baby-bonus.auth.caller-identity=test-client",
+        TestProperties.API_KEY,
+        TestProperties.CALLER_IDENTITY,
+        TestProperties.UNIQUE_H2_DATABASE,
     ],
 )
 @AutoConfigureMockMvc
