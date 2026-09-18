@@ -55,6 +55,14 @@ For ECR publishing from `main`, configure:
 
 The ECR repository is expected to exist as `baby-bonus-enrollment-service` in `ap-southeast-1`; creating it is handled by infrastructure rather than the CI workflow.
 
+### Deployment Approach
+
+CI builds and tests the service, then pushes an immutable Docker image to ECR from `main`.
+
+Terraform under `infra/` provisions the AWS platform shape: networking, EKS, RDS, IAM, security groups, and ECR. Application rollout to EKS would be handled by a separate CD step using Helm or Kubernetes manifests, referencing the ECR image tag produced by CI.
+
+In production, the EKS workload should use readiness and liveness probes, rolling updates, rollback on failed rollout, IRSA for AWS access, and Secrets Manager or External Secrets for runtime configuration.
+
 ## Infrastructure
 
 Terraform for the AWS production sketch is under `infra/`:
@@ -79,6 +87,7 @@ terraform validate
 - Replace mock ICA and IROAS lookups with real adapters, including timeouts, retries, authentication, and contract tests.
 - Map concurrent duplicate-enrollment database races to the same duplicate-enrollment response.
 - Move disbursement processing to an asynchronous, reconcilable payment workflow with idempotency and reversal support.
+- Add a CD stage to deploy the ECR image to EKS using Helm or Kubernetes manifests.
 - Add CDA account lifecycle, refunds, and manual correction workflows after authorization and audit rules are defined.
 - Add production-grade identity, field-level NRIC protection, durable audit retention, monitoring, and alerting.
 - Revisit Kotlin static analysis once ktlint or Detekt support cleanly matches the selected Kotlin version.
