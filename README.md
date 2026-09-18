@@ -46,3 +46,13 @@ For ECR publishing from `main`, configure:
 - repository secret `AWS_ROLE_TO_ASSUME`
 
 The ECR repository is expected to exist as `baby-bonus-enrollment-service` in `ap-southeast-1`; creating it is handled by infrastructure rather than the CI workflow.
+
+## Infrastructure
+
+Terraform for the AWS production sketch is under `infra/`:
+
+```bash
+cd infra
+terraform init
+terraform validate
+```
